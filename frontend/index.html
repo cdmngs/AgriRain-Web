@@ -3,51 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgriRain | Smart Forecasts for Rice Farmers</title>
+    <title>AgriRain | Precision Rice Farming</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <style>
         html { scroll-behavior: smooth; }
+        /* Map needs a clear height to show up */
+        #map-section { height: 500px; width: 100%; z-index: 10; }
     </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-900">
 
-    <nav class="fixed w-full bg-white/80 backdrop-blur-md shadow-sm z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+    <nav class="fixed w-full bg-white/90 backdrop-blur-md shadow-sm z-[1000]">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <h1 class="text-2xl font-bold text-blue-600 tracking-tight">AgriRain</h1>
-            <div class="space-x-6 hidden md:block">
-                <a href="#home" class="hover:text-blue-500 transition">Home</a>
-                <a href="#map-section" class="hover:text-blue-500 transition">Map</a>
-            </div>
+            <a href="#map-section" class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition font-medium">Launch Map</a>
         </div>
     </nav>
 
-    <header id="home" class="relative h-screen flex items-center justify-center bg-slate-900 overflow-hidden">
-        <div class="absolute inset-0 opacity-40">
-            <img src="https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?auto=format&fit=crop&w=1920&q=80" 
-                 alt="Rice field background" class="w-full h-full object-cover">
-        </div>
-
-        <div class="relative z-10 text-center px-4">
-            <h2 class="text-4xl md:text-6xl font-extrabold text-white mb-6">
-                Smarter Planting for <br><span class="text-blue-400">Rice Farmers</span>
-            </h2>
-            <p class="text-lg md:text-xl text-slate-200 mb-8 max-w-2xl mx-auto">
-                Localized rain forecasts and decision support to protect your crops 
-                and optimize your harvest activities.
-            </p>
-            <a href="#map-section" 
-               class="inline-block bg-blue-500 hover:bg-blue-400 text-white font-bold py-4 px-10 rounded-full transition transform hover:scale-105 shadow-xl">
-                Get Started with Your Farm
-            </a>
+    <header class="h-[50vh] flex items-center justify-center bg-slate-900 relative">
+        <div class="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center"></div>
+        <div class="relative text-center px-4">
+            <h2 class="text-4xl md:text-6xl font-black text-white mb-4">Select Your Field</h2>
+            <p class="text-slate-300 text-lg">Pin your exact farm location to get localized rain forecasts.</p>
         </div>
     </header>
 
-    <section id="map-section" class="h-screen bg-white flex items-center justify-center border-t border-slate-200">
-        <div class="text-center">
-            <h3 class="text-3xl font-bold mb-4">Map Section</h3>
-            <p class="text-slate-500">Coming soon in AG-2...</p>
+    <main class="max-w-5xl mx-auto -mt-20 relative z-20 px-4 pb-20">
+        <div class="bg-white p-4 rounded-3xl shadow-2xl border border-slate-200">
+            <div id="map-section" class="rounded-2xl"></div>
+            
+            <div id="coord-info" class="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs uppercase tracking-wider text-blue-500 font-bold">Selected Coordinates</p>
+                    <p id="lat-lng-text" class="text-lg font-mono text-slate-700 italic">Click the map to pin a location...</p>
+                </div>
+                <button id="confirm-loc" class="hidden bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">
+                    Confirm Location
+                </button>
+            </div>
         </div>
-    </section>
+    </main>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script src="js/weatherService.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
