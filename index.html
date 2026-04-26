@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriRain</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <header class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between p-0 bg-transparent mb-8">
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 shadow-sm">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-800">Live Farm Update</span>
+                    </span>
+                </div>
+                <h1 class="mt-3 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">Precision farm weather for the Philippines</h1>
+                <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">Pin your farm, choose a target date, and get a polished 7-day agri-weather scorecard with humidity alerts, evapotranspiration guidance, and rainfall risk.</p>
+            </div>
+        </header>
+
+        <section class="grid gap-8 lg:grid-cols-[1.45fr_0.9fr]">
+            <div class="glass-panel rounded-xl overflow-hidden border border-white/80">
+                <div id="map"></div>
+                <div class="p-6 bg-slate-50/50 flex flex-col gap-6">
+                    <div class="flex items-center gap-4 w-full">
+                        <span class="grid h-12 w-12 place-items-center rounded-xl bg-slate-900 text-white shadow-lg shrink-0"><i class="fa-solid fa-map-location-dot"></i></span>
+                        <div class="min-w-0">
+                            <p class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Selected Farm</p>
+                            <p id="loc-name" class="mt-0.5 truncate text-sm font-bold text-slate-800 uppercase tracking-tight">No Location Selected</p>
+                            <p id="loc-coords" class="text-xs font-mono text-slate-400">0.0000, 0.0000</p>
+                        </div>
+                    </div>
+                    <button id="find-me-btn" class="w-full inline-flex items-center justify-center rounded-xl bg-slate-900 px-6 py-4 text-[13px] font-bold uppercase tracking-[0.2em] text-white transition hover:bg-slate-800 active:scale-[0.98] shadow-lg">
+                        <i class="fa-solid fa-location-crosshairs mr-2"></i>Use my location
+                    </button>
+                </div>
+            </div>
