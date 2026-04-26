@@ -44,3 +44,49 @@
                     </button>
                 </div>
             </div>
+            
+
+    <aside class="space-y-6">
+                <div class="glass-panel rounded-xl p-6 border border-white/80 hero-gradient shadow-2xl">
+                    <span class="inline-flex rounded-xl bg-emerald-100 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-emerald-700">7-Day Planning</span>
+                    <h2 class="mt-5 text-2xl font-extrabold text-slate-900">Farm-ready forecast</h2>
+                    <p class="mt-4 text-sm leading-6 text-slate-700">Set your planting or spray schedule with the latest meteorological insights for your exact field.</p>
+                    <div class="mt-6 space-y-4">
+                        <div class="rounded-xl bg-white/90 p-4 text-sm shadow-inner border border-slate-200">
+                            <label class="block text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Target Date</label>
+                            <input type="date" id="target-date" class="mt-3 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-emerald-500" />
+                        </div>
+                        <button id="analyze-btn" class="opacity-50 cursor-not-allowed w-full rounded-xl bg-slate-900 px-6 py-4 text-sm font-black uppercase tracking-[0.2em] text-white transition shadow-2xl" disabled>
+                            <i class="fa-solid fa-microchip mr-2"></i>Generate Analysis
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl p-6 border border-white/80 shadow-2xl">
+                    <p class="text-[11px] uppercase tracking-[0.3em] text-slate-500"><b>How it Works</b></p>
+                    <div class="mt-5 space-y-5 text-sm text-slate-600">
+                        <div class="flex gap-4">
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 font-bold">1</span>
+                            <div>
+                                <p class="font-bold text-slate-900">Geofencing & Pinning</p>
+                                <p class="mt-1 text-xs">Pin your land on the map. The system restricts analysis to coordinates within the Philippine territory.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-600 font-bold">2</span>
+                            <div>
+                                <p class="font-bold text-slate-900">Meteorological Pull</p>
+                                <p class="mt-1 text-xs">We aggregate data from Open-Meteo including Solar Radiation and ET0 (Evapotranspiration).</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-600 font-bold">3</span>
+                            <div>
+                                <p class="font-bold text-slate-900">Decision Support</p>
+                                <p class="mt-1 text-xs">Dynamic indicators highlight risks: High RH for fungal growth or high VPD for crop water stress.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </section>
