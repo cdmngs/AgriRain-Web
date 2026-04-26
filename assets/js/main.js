@@ -60,34 +60,4 @@ analyzeBtn.addEventListener('click', async () => {
     const start = dateInput.value;
     const end = new Date(start); 
     end.setDate(end.getDate() + 6);
-    const endDateStr = end.toISOString().split('T')[0];
-
-    try {
-        const data = await getWeatherData(selectedData.lat, selectedData.lng, start, endDateStr);
-        document.getElementById('results-area').classList.remove('hidden');
-
-        const avgMaxRH = data.daily.relative_humidity_2m_max.reduce((a, b) => a + b, 0) / 7;
-        const solar = data.daily.shortwave_radiation_sum[0];
-        const et0 = data.daily.et0_fao_evapotranspiration[0];
-        const vpd = data.hourly.vapour_pressure_deficit[0];
-
-        document.getElementById('val-rh').innerText = Math.round(avgMaxRH) + "%";
-        document.getElementById('val-solar').innerText = solar.toFixed(1) + " MJ";
-        document.getElementById('val-et0').innerText = et0.toFixed(1) + " mm";
-        document.getElementById('val-vpd').innerText = vpd.toFixed(2) + " kPa";
-
-        applyCardStyle('card-rh', 'icon-rh', 'val-rh', avgMaxRH, 'rh');
-        applyCardStyle('card-solar', 'icon-solar', 'val-solar', solar, 'solar');
-        applyCardStyle('card-et0', 'icon-et0', 'val-et0', et0, 'et0');
-        applyCardStyle('card-vpd', 'icon-vpd', 'val-vpd', vpd, 'vpd');
-
-        renderTrendList(data);
-        updateAdvisoryBox(data.daily.precipitation_probability_max[0] > 70);
-
-        document.getElementById('results-area').scrollIntoView({ behavior: 'smooth' });
-    } catch (err) { alert("Data fetch failed."); }
-    finally { 
-        analyzeBtn.disabled = false; 
-        analyzeBtn.innerHTML = '<i class="fa-solid fa-microchip mr-2"></i> Generate Analysis'; 
-    }
-});
+    const endDateStr = end.toISOString().split('T')[0]; 
