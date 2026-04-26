@@ -1,5 +1,3 @@
-//Ticket AG-2: Map Integration
-
 const phBounds = L.latLngBounds([4.4, 116.0], [21.4, 127.0]);
 
 
