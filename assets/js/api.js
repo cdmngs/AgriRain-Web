@@ -8,4 +8,6 @@ async function getWeatherData(lat, lng, start, end) {
     const res = await fetch(url);
     const data = await res.json();
     
+    if (data.error) throw new Error(data.reason);
+    return data;
 }
