@@ -32,6 +32,7 @@ async function handleLocationSelection(lat, lng) {
         analyzeBtn.disabled = false;
         analyzeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         document.getElementById('loc-name').innerText = addrParts.join(', ');
+<<<<<<< HEAD
         document.getElementById('loc-coords').innerText = `${selectedData.lat}, ${selectedData.lng}`;
     } catch (err) { console.error(err); }
 }
@@ -50,3 +51,8 @@ findMeBtn.addEventListener('click', () => {
         () => { findMeBtn.disabled = false; findMeBtn.innerHTML = orig; }
     );
 });
+=======
+        document.getElementById('loc-coords').innerText = ${selectedData.lat}, ${selectedData.lng};
+    } catch (err) { console.error(err); }
+}
+>>>>>>> origin/main
