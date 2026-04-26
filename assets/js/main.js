@@ -1,3 +1,4 @@
+//Ticket AG-2: Map Integration
 let selectedData = { lat: null, lng: null, isValid: false };
 const todayStr = new Date().toISOString().split('T')[0];
 
