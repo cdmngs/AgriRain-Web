@@ -60,4 +60,4 @@ analyzeBtn.addEventListener('click', async () => {
     const start = dateInput.value;
     const end = new Date(start); 
     end.setDate(end.getDate() + 6);
-    const endDateStr = end.toISOString().split('T')[0];
+    const endDateStr = end.toISOString().split('T')[0]; 
