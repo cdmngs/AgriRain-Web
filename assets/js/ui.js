@@ -1,4 +1,35 @@
+/**
+ * Changes card colors based on agronomic thresholds
+ */
+function applyCardStyle(cardId, iconId, textId, value, type) {
+    const card = document.getElementById(cardId);
+    const icon = document.getElementById(iconId);
+    const text = document.getElementById(textId);
+    let color = "slate";
 
+    if (type === 'rh') {
+        color = value > 85 ? "rose" : value < 50 ? "amber" : "sky";
+    } else if (type === 'solar') {
+        color = value < 10 ? "slate" : value > 22 ? "amber" : "emerald";
+    } else if (type === 'et0') {
+        color = value > 6 ? "rose" : value > 4 ? "amber" : "emerald";
+    } else if (type === 'vpd') {
+        color = value > 1.5 ? "rose" : value > 0.8 ? "amber" : "emerald";
+    }
+
+    const schemes = {
+        rose: { bg: 'bg-rose-50/90', border: 'border-rose-200', text: 'text-rose-900', icon: 'bg-rose-100 text-rose-600' },
+        emerald: { bg: 'bg-emerald-50/90', border: 'border-emerald-200', text: 'text-emerald-900', icon: 'bg-emerald-100 text-emerald-600' },
+        amber: { bg: 'bg-amber-50/90', border: 'border-amber-200', text: 'text-amber-900', icon: 'bg-amber-100 text-amber-600' },
+        sky: { bg: 'bg-sky-50/90', border: 'border-sky-200', text: 'text-sky-900', icon: 'bg-sky-100 text-sky-600' },
+        slate: { bg: 'bg-slate-50/90', border: 'border-slate-200', text: 'text-slate-900', icon: 'bg-slate-100 text-slate-600' }
+    };
+
+    const s = schemes[color];
+    card.className = `agro-card ${s.bg} ${s.border}`;
+    text.className = `mt-3 text-3xl font-black ${s.text}`;
+    icon.className = `inline-flex h-14 w-14 items-center justify-center rounded-xl mb-4 mx-auto ${s.icon}`;
+}
 
 /**
  * Updates the big recommendation/warning box
