@@ -1,4 +1,3 @@
-//Ticket AG-2: Map Integration
 let selectedData = { lat: null, lng: null, isValid: false };
 const todayStr = new Date().toISOString().split('T')[0];
 
@@ -11,7 +10,7 @@ dateInput.setAttribute('min', todayStr);
 
 async function handleLocationSelection(lat, lng) {
     if (!phBounds.contains([lat, lng])) {
-        alert("Restricted: AgriRain is only available within the Philippines.");
+        showToast("Restricted: AgriRain is only available within the Philippines.");
         return;
     }
     
@@ -29,11 +28,16 @@ async function handleLocationSelection(lat, lng) {
         selectedData = { lat: lat.toFixed(4), lng: lng.toFixed(4), isValid: true };
         updateMapMarker(lat, lng);
 
+    
         analyzeBtn.disabled = false;
         analyzeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        
         document.getElementById('loc-name').innerText = addrParts.join(', ');
         document.getElementById('loc-coords').innerText = `${selectedData.lat}, ${selectedData.lng}`;
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+        console.error(err); 
+        showToast("Failed to retrieve address details.");
+    }
 }
 
 map.on('click', (e) => handleLocationSelection(e.latlng.lat, e.latlng.lng));
@@ -42,12 +46,18 @@ findMeBtn.addEventListener('click', () => {
     findMeBtn.disabled = true;
     const orig = findMeBtn.innerHTML;
     findMeBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> LOCATING...';
+    
     navigator.geolocation.getCurrentPosition(
         async (pos) => {
             await handleLocationSelection(pos.coords.latitude, pos.coords.longitude);
-            findMeBtn.disabled = false; findMeBtn.innerHTML = orig;
+            findMeBtn.disabled = false; 
+            findMeBtn.innerHTML = orig;
         },
-        () => { findMeBtn.disabled = false; findMeBtn.innerHTML = orig; }
+        () => { 
+            findMeBtn.disabled = false; 
+            findMeBtn.innerHTML = orig; 
+            showToast("Location access denied or unavailable.");
+        }
     );
 });
 
@@ -60,34 +70,55 @@ analyzeBtn.addEventListener('click', async () => {
     const start = dateInput.value;
     const end = new Date(start); 
     end.setDate(end.getDate() + 6);
-    const endDateStr = end.toISOString().split('T')[0]; 
+    const endDateStr = end.toISOString().split('T')[0];
 
     try {
         const data = await getWeatherData(selectedData.lat, selectedData.lng, start, endDateStr);
         document.getElementById('results-area').classList.remove('hidden');
+        const avg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
 
-        const avgMaxRH = data.daily.relative_humidity_2m_max.reduce((a, b) => a + b, 0) / 7;
-        const solar = data.daily.shortwave_radiation_sum[0];
-        const et0 = data.daily.et0_fao_evapotranspiration[0];
-        const vpd = data.hourly.vapour_pressure_deficit[0];
+        const avgRH = avg(data.daily.relative_humidity_2m_max);
+        const avgSolar = avg(data.daily.shortwave_radiation_sum);
+        const avgEt0 = avg(data.daily.et0_fao_evapotranspiration);
 
-        document.getElementById('val-rh').innerText = Math.round(avgMaxRH) + "%";
-        document.getElementById('val-solar').innerText = solar.toFixed(1) + " MJ";
-        document.getElementById('val-et0').innerText = et0.toFixed(1) + " mm";
-        document.getElementById('val-vpd').innerText = vpd.toFixed(2) + " kPa";
+        const vpdToday = data.hourly.vapour_pressure_deficit.slice(0, 24);
+        const maxVpdToday = Math.max(...vpdToday);
 
-        applyCardStyle('card-rh', 'icon-rh', 'val-rh', avgMaxRH, 'rh');
-        applyCardStyle('card-solar', 'icon-solar', 'val-solar', solar, 'solar');
-        applyCardStyle('card-et0', 'icon-et0', 'val-et0', et0, 'et0');
-        applyCardStyle('card-vpd', 'icon-vpd', 'val-vpd', vpd, 'vpd');
+        const bestDayIndex = findBestFarmingDay(data);
+        const bestDate = new Date(data.daily.time[bestDayIndex]).toLocaleDateString('en-US', { 
+            weekday: 'long', month: 'short', day: 'numeric' 
+        });
+
+        document.getElementById('val-rh').innerText = Math.round(avgRH) + "%";
+        document.getElementById('val-solar').innerText = avgSolar.toFixed(1) + " MJ";
+        document.getElementById('val-et0').innerText = avgEt0.toFixed(1) + " mm";
+        document.getElementById('val-vpd').innerText = maxVpdToday.toFixed(2) + " kPa";
+
+        applyCardStyle('card-rh', 'icon-rh', 'val-rh', avgRH, 'rh');
+        applyCardStyle('card-solar', 'icon-solar', 'val-solar', avgSolar, 'solar');
+        applyCardStyle('card-et0', 'icon-et0', 'val-et0', avgEt0, 'et0');
+        applyCardStyle('card-vpd', 'icon-vpd', 'val-vpd', maxVpdToday, 'vpd');
 
         renderTrendList(data);
-        updateAdvisoryBox(data.daily.precipitation_probability_max[0] > 70);
+        updateAdvisoryBox(data.daily.precipitation_probability_max[0] > 70, bestDate);
 
         document.getElementById('results-area').scrollIntoView({ behavior: 'smooth' });
-    } catch (err) { alert("Data fetch failed."); }
-    finally { 
+        
+    } catch (err) { 
+        showToast("Data fetch failed. Check connection."); 
+    } finally { 
         analyzeBtn.disabled = false; 
         analyzeBtn.innerHTML = '<i class="fa-solid fa-microchip mr-2"></i> Generate Analysis'; 
     }
 });
+
+function findBestFarmingDay(data) {
+    let scores = data.daily.time.map((_, i) => {
+        let score = 0;
+        score -= data.daily.precipitation_probability_max[i] * 2;
+        if (data.daily.shortwave_radiation_sum[i] > 15) score += 50;
+        if (data.daily.et0_fao_evapotranspiration[i] > 6) score -= 30;
+        return score;
+    });
+    return scores.indexOf(Math.max(...scores));
+}
