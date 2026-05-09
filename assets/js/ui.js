@@ -1,6 +1,3 @@
-/**
- * Changes card colors based on agronomic thresholds
- */
 function applyCardStyle(cardId, iconId, textId, value, type) {
     const card = document.getElementById(cardId);
     const icon = document.getElementById(iconId);
@@ -31,10 +28,7 @@ function applyCardStyle(cardId, iconId, textId, value, type) {
     icon.className = `inline-flex h-14 w-14 items-center justify-center rounded-xl mb-4 mx-auto ${s.icon}`;
 }
 
-/**
- * Updates the big recommendation/warning box
- */
-function updateAdvisoryBox(isRainy) {
+function updateAdvisoryBox(isRainy, bestDate) {
     const box = document.getElementById('rec-box');
     const title = document.getElementById('rec-title');
     const heading = document.getElementById('rec-heading');
@@ -44,21 +38,17 @@ function updateAdvisoryBox(isRainy) {
     if (isRainy) {
         box.className = "glass-panel rounded-xl border border-red-200 p-8 shadow-2xl bg-red-50 text-red-800";
         title.innerText = "HEAVY RAIN WARNING";
-        heading.innerText = "Delay outdoor work";
+        heading.innerText = `Preferred Schedule: ${bestDate}`;
         icon.className = "inline-flex h-12 w-12 items-center justify-center rounded-xl bg-red-100 text-red-700 fa-solid fa-cloud-showers-heavy text-xl";
-        text.innerText = "High probability of rain detected. Postpone spraying.";
+        text.innerText = "Heavy rain is expected today. Based on 7-day trends, the optimal conditions for field work will occur on " + bestDate + ".";
     } else {
         box.className = "glass-panel rounded-xl border border-emerald-200 p-8 shadow-2xl bg-emerald-50 text-emerald-800";
         title.innerText = "OPTIMAL FARMING CONDITIONS";
-        heading.innerText = "Plan with confidence";
+        heading.innerText = "Proceed with operations";
         icon.className = "inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 fa-solid fa-square-check text-xl";
-        text.innerText = "Stable weather patterns detected. Ideal for land preparation.";
+        text.innerText = `Conditions are stable. If you miss today, ${bestDate} also shows a high stability score for irrigation or fertilization.`;
     }
 }
-
-/**
- * Renders the 7-day trend list items
- */
 
 function renderTrendList(data) {
     const list = document.getElementById('trend-list');
@@ -80,4 +70,41 @@ function renderTrendList(data) {
                 </div>
             </div>`;
     });
+}
+
+function showToast(message, type = 'error') {
+    const mapWrapper = document.querySelector('.glass-panel.rounded-xl.overflow-hidden');
+    
+    let container = document.querySelector('.alert-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'alert-container';
+        mapWrapper.style.position = 'relative';
+        mapWrapper.prepend(container);
+    }
+
+    const alert = document.createElement('div');
+    alert.className = `alert-ui alert-${type}`;
+    const icon = type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info';
+    
+    alert.innerHTML = `
+        <div class="h-8 w-8 shrink-0 flex items-center justify-center rounded-lg bg-white/50">
+            <i class="fa-solid ${icon}"></i>
+        </div>
+        <div class="flex-1">
+            <p class="text-[10px] font-black uppercase tracking-widest opacity-70">${type === 'error' ? 'System Alert' : 'Notice'}</p>
+            <p class="text-sm font-bold leading-tight">${message}</p>
+        </div>
+        <button onclick="this.parentElement.remove()" class="opacity-50 hover:opacity-100 transition">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    `;
+
+    container.appendChild(alert);
+    setTimeout(() => alert.classList.add('show'), 10);
+
+    setTimeout(() => {
+        alert.classList.remove('show');
+        setTimeout(() => alert.remove(), 400);
+    }, 5000);
 }
