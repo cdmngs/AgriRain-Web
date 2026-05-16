@@ -21,7 +21,7 @@ function getRiceRecommendations(data) {
         recommendation = {
             type: "Drought-Tolerant / Early Maturing Varieties",
             varieties: "NSIC Rc 192 (Sahod Ulan 1), NSIC Rc 272 (Sahod Ulan 2), PSB Rc 14 (Arayat)",
-            reason: "High Evapotranspiration ($ET_0$) and Vapor Pressure Deficit indicate high water stress. These Sahod Ulan varieties are deep-rooted and mature early, escaping prolonged dry spells."
+            reason: "High Evapotranspiration (ET0) and Vapor Pressure Deficit indicate high water stress. These Sahod Ulan varieties are deep-rooted and mature early, escaping prolonged dry spells."
         };
     } else if (avgSolar > 20 && totalRain < 15) {
         conditionType = "Irrigated Lowland / High Solar Dry Season";
