@@ -27,12 +27,11 @@ async function handleLocationSelection(lat, lng) {
 
         selectedData = { lat: lat.toFixed(4), lng: lng.toFixed(4), isValid: true };
         updateMapMarker(lat, lng);
-
     
         analyzeBtn.disabled = false;
         analyzeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         
-        document.getElementById('loc-name').innerText = addrParts.join(', ');
+        document.getElementById('loc-name').innerText = addrParts.join(', ') || "Selected Philippine Site";
         document.getElementById('loc-coords').innerText = `${selectedData.lat}, ${selectedData.lng}`;
     } catch (err) { 
         console.error(err); 
@@ -40,7 +39,9 @@ async function handleLocationSelection(lat, lng) {
     }
 }
 
-map.on('click', (e) => handleLocationSelection(e.latlng.lat, e.latlng.lng));
+if (typeof map !== 'undefined' && map) {
+    map.on('click', (e) => handleLocationSelection(e.latlng.lat, e.latlng.lng));
+}
 
 findMeBtn.addEventListener('click', () => {
     findMeBtn.disabled = true;
@@ -100,11 +101,29 @@ analyzeBtn.addEventListener('click', async () => {
         applyCardStyle('card-vpd', 'icon-vpd', 'val-vpd', maxVpdToday, 'vpd');
 
         renderTrendList(data);
+
         updateAdvisoryBox(data.daily.precipitation_probability_max[0] > 70, bestDate);
+
+        const riceRec = getRiceRecommendations(data);
+        document.getElementById('rice-zone').innerText = riceRec.conditionType;
+        document.getElementById('rice-type').innerText = riceRec.type;
+
+        const strainsContainer = document.getElementById('rice-strains');
+        strainsContainer.innerHTML = ''; 
+
+        riceRec.varieties.split(',').forEach(strain => {
+            const badge = document.createElement('span');
+            badge.className = "bg-emerald-100 text-slate-900 border border-emerald-200 px-2.5 py-1 text-xs font-bold rounded-lg tracking-tight inline-block";
+            badge.innerText = strain.trim();
+            strainsContainer.appendChild(badge);
+        });
+
+        document.getElementById('rice-reason').innerText = riceRec.reason;
 
         document.getElementById('results-area').scrollIntoView({ behavior: 'smooth' });
         
     } catch (err) { 
+        console.error(err);
         showToast("Data fetch failed. Check connection."); 
     } finally { 
         analyzeBtn.disabled = false; 
@@ -121,4 +140,47 @@ function findBestFarmingDay(data) {
         return score;
     });
     return scores.indexOf(Math.max(...scores));
+}
+
+function getRiceRecommendations(data) {
+    const avg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
+    
+    const avgSolar = avg(data.daily.shortwave_radiation_sum);
+    const avgEt0 = avg(data.daily.et0_fao_evapotranspiration);
+    const totalRain = data.daily.precipitation_sum.reduce((a, b) => a + b, 0);
+
+    let conditionType = "";
+    let recommendation = {};
+
+    if (totalRain > 50 || avgEt0 < 3.5) {
+        conditionType = "Rainfed Lowland / High Rainfall Wet Season";
+        recommendation = {
+            type: "Inbred (Flood-Tolerant & Disease-Resistant)",
+            varieties: "NSIC Rc 222 (Tubigan 18), NSIC Rc 160 (Tubigan 14), Submarino varieties (e.g., NSIC Rc 194)",
+            reason: "High cumulative rainfall detected. These varieties resist lodging (falling over in rain) and tolerate flash floods or standing water while remaining resistant to wet season fungal diseases."
+        };
+    } else if (avgEt0 > 5.5) {
+        conditionType = "Drought-Prone / Upland Dry Conditions";
+        recommendation = {
+            type: "Drought-Tolerant / Early Maturing Varieties",
+            varieties: "NSIC Rc 192 (Sahod Ulan 1), NSIC Rc 272 (Sahod Ulan 2), PSB Rc 14 (Arayat)",
+            reason: "High Evapotranspiration (ET0) values indicate high water loss and moisture stress. These varieties have deeper root structures and mature early to escape prolonged dry spells."
+        };
+    } else if (avgSolar > 20 && totalRain < 15) {
+        conditionType = "Irrigated Lowland / High Solar Dry Season";
+        recommendation = {
+            type: "High-Yielding Hybrids",
+            varieties: "Mestiso 19, Mestiso 20, NSIC Rc 238 (Tubigan 21)",
+            reason: "Abundant solar radiation detected along with low precipitation limits. This is ideal for hybrid rice variations, maximizing photosynthesis under irrigated, high-sun conditions for optimized grain yield."
+        };
+    } else {
+        conditionType = "Standard Irrigated Lowland (Flexible)";
+        recommendation = {
+            type: "General-Purpose Modern Inbreds",
+            varieties: "NSIC Rc 216, NSIC Rc 436",
+            reason: "Stable environmental baseline metrics detected. These general-purpose variations offer balanced yields, optimal milling recovery rates, and excellent crop resilience under standard irrigation management."
+        };
+    }
+
+    return { conditionType, ...recommendation };
 }

@@ -53,17 +53,42 @@ function updateAdvisoryBox(isRainy, bestDate) {
 function renderTrendList(data) {
     const list = document.getElementById('trend-list');
     list.innerHTML = "";
+    
     data.daily.time.forEach((date, i) => {
         const prob = data.daily.precipitation_probability_max[i];
         const rain = data.daily.precipitation_sum[i];
         const d = new Date(date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        
         let bgClass = prob > 70 ? "bg-rose-50 text-rose-900 border-rose-200" : 
                       prob > 40 ? "bg-amber-50 text-amber-900 border-amber-200" : 
                       "bg-emerald-50 text-emerald-900 border-emerald-200";
 
+        let iconClass = "fa-solid fa-sun text-emerald-500";
+        
+        if (prob > 70) {
+            if (rain > 10) {
+                iconClass = "fa-solid fa-cloud-showers-heavy text-rose-600";
+            } else {
+                iconClass = "fa-solid fa-cloud-rain text-rose-500";
+            }
+        } else if (prob > 40) {
+            if (rain > 2) {
+                iconClass = "fa-solid fa-cloud-sun-rain text-amber-600";
+            } else {
+                iconClass = "fa-solid fa-cloud text-amber-500";
+            }
+        } else if (prob > 15 && rain > 0) {
+            iconClass = "fa-solid fa-cloud-sun text-emerald-600";
+        }
+
         list.innerHTML += `
             <div class="flex items-center justify-between px-3 py-2 rounded-xl shadow-sm trend-row ${bgClass}">
-                <span class="text-[11px] font-bold uppercase tracking-tight">${d}</span>
+                <div class="flex items-center gap-3">
+                    <span class="w-6 text-center flex items-center justify-center text-sm">
+                        <i class="${iconClass}"></i>
+                    </span>
+                    <span class="text-[11px] font-bold uppercase tracking-tight">${d}</span>
+                </div>
                 <div class="flex items-center gap-3">
                     <span class="trend-prob-cell text-[11px] font-black tracking-widest">${prob}%</span>
                     <span class="trend-rain-cell text-[10px] font-bold bg-white/40 py-0.5 px-1 rounded border border-black/5">${rain}mm</span>
@@ -74,13 +99,13 @@ function renderTrendList(data) {
 
 function showToast(message, type = 'error') {
     const mapWrapper = document.querySelector('.glass-panel.rounded-xl.overflow-hidden');
+    if (!mapWrapper) return;
     
-    let container = document.querySelector('.alert-container');
+    let container = mapWrapper.querySelector('.alert-container');
     if (!container) {
         container = document.createElement('div');
         container.className = 'alert-container';
-        mapWrapper.style.position = 'relative';
-        mapWrapper.prepend(container);
+        mapWrapper.appendChild(container);
     }
 
     const alert = document.createElement('div');
@@ -104,7 +129,9 @@ function showToast(message, type = 'error') {
     setTimeout(() => alert.classList.add('show'), 10);
 
     setTimeout(() => {
-        alert.classList.remove('show');
-        setTimeout(() => alert.remove(), 400);
+        if (alert.parentNode) {
+            alert.classList.remove('show');
+            setTimeout(() => alert.remove(), 400);
+        }
     }, 5000);
 }
