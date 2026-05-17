@@ -96,3 +96,19 @@ body {
     border-color: #dcfce7; 
     color: #166534; 
 }
+
+footer {
+    position: relative;
+    z-index: 10;
+}
+
+.footer-link {
+    text-decoration: none;
+    display: inline-block;
+    transition: color 0.2s ease-in-out, transform 0.2s ease;
+}
+
+.footer-link:hover {
+    color: #059669 !important;
+    transform: translateX(2px);
+}
