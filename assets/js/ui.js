@@ -64,32 +64,46 @@ function renderTrendList(data) {
                       "bg-emerald-50 text-emerald-900 border-emerald-200";
 
         let iconClass = "fa-solid fa-sun text-emerald-500";
+        let conditionText = "Sunny";
         
         if (prob > 70) {
             if (rain > 10) {
                 iconClass = "fa-solid fa-cloud-showers-heavy text-rose-600";
+                conditionText = "Heavy Rain";
             } else {
                 iconClass = "fa-solid fa-cloud-rain text-rose-500";
+                conditionText = "Rainy";
             }
         } else if (prob > 40) {
             if (rain > 2) {
                 iconClass = "fa-solid fa-cloud-sun-rain text-amber-600";
+                conditionText = "Scattered Showers";
             } else {
                 iconClass = "fa-solid fa-cloud text-amber-500";
+                conditionText = "Mostly Cloudy";
             }
         } else if (prob > 15 && rain > 0) {
             iconClass = "fa-solid fa-cloud-sun text-emerald-600";
+            conditionText = "Partly Cloudy";
         }
 
         list.innerHTML += `
             <div class="flex items-center justify-between px-3 py-2 rounded-xl shadow-sm trend-row ${bgClass}">
-                <div class="flex items-center gap-3">
+                <!-- Left Section: Icon and Date -->
+                <div class="flex items-center gap-3 w-1/3 min-w-[120px]">
                     <span class="w-6 text-center flex items-center justify-center text-sm">
                         <i class="${iconClass}"></i>
                     </span>
                     <span class="text-[11px] font-bold uppercase tracking-tight">${d}</span>
                 </div>
-                <div class="flex items-center gap-3">
+                
+                <!-- Center Section: Weather Status Summary Text (BOLDED) -->
+                <div class="flex-1 text-center hidden sm:block">
+                    <span class="text-[11px] font-black uppercase tracking-wider">${conditionText}</span>
+                </div>
+                
+                <!-- Right Section: Probabilities and Totals -->
+                <div class="flex items-center justify-end gap-3 w-1/3 min-w-[140px]">
                     <span class="trend-prob-cell text-[11px] font-black tracking-widest">${prob}%</span>
                     <span class="trend-rain-cell text-[10px] font-bold bg-white/40 py-0.5 px-1 rounded border border-black/5">${rain}mm</span>
                 </div>

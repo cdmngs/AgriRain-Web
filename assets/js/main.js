@@ -39,9 +39,14 @@ async function handleLocationSelection(lat, lng) {
     }
 }
 
-if (typeof map !== 'undefined' && map) {
-    map.on('click', (e) => handleLocationSelection(e.latlng.lat, e.latlng.lng));
+function initMapListener() {
+    if (typeof map !== 'undefined' && map) {
+        map.on('click', (e) => handleLocationSelection(e.latlng.lat, e.latlng.lng));
+    } else {
+        setTimeout(initMapListener, 100);
+    }
 }
+initMapListener();
 
 findMeBtn.addEventListener('click', () => {
     findMeBtn.disabled = true;
@@ -76,14 +81,18 @@ analyzeBtn.addEventListener('click', async () => {
     try {
         const data = await getWeatherData(selectedData.lat, selectedData.lng, start, endDateStr);
         document.getElementById('results-area').classList.remove('hidden');
-        const avg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
 
+        const targetDateIndex = data.daily.time.findIndex(t => t === start);
+        const safeIndex = targetDateIndex !== -1 ? targetDateIndex : 0;
+
+        const avg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
         const avgRH = avg(data.daily.relative_humidity_2m_max);
         const avgSolar = avg(data.daily.shortwave_radiation_sum);
         const avgEt0 = avg(data.daily.et0_fao_evapotranspiration);
 
-        const vpdToday = data.hourly.vapour_pressure_deficit.slice(0, 24);
-        const maxVpdToday = Math.max(...vpdToday);
+        const hourlyStartOffset = safeIndex * 24;
+        const vpdTargetDay = data.hourly.vapour_pressure_deficit.slice(hourlyStartOffset, hourlyStartOffset + 24);
+        const maxVpdTargetDay = vpdTargetDay.length ? Math.max(...vpdTargetDay) : 0;
 
         const bestDayIndex = findBestFarmingDay(data);
         const bestDate = new Date(data.daily.time[bestDayIndex]).toLocaleDateString('en-US', { 
@@ -93,16 +102,16 @@ analyzeBtn.addEventListener('click', async () => {
         document.getElementById('val-rh').innerText = Math.round(avgRH) + "%";
         document.getElementById('val-solar').innerText = avgSolar.toFixed(1) + " MJ";
         document.getElementById('val-et0').innerText = avgEt0.toFixed(1) + " mm";
-        document.getElementById('val-vpd').innerText = maxVpdToday.toFixed(2) + " kPa";
+        document.getElementById('val-vpd').innerText = maxVpdTargetDay.toFixed(2) + " kPa";
 
         applyCardStyle('card-rh', 'icon-rh', 'val-rh', avgRH, 'rh');
         applyCardStyle('card-solar', 'icon-solar', 'val-solar', avgSolar, 'solar');
         applyCardStyle('card-et0', 'icon-et0', 'val-et0', avgEt0, 'et0');
-        applyCardStyle('card-vpd', 'icon-vpd', 'val-vpd', maxVpdToday, 'vpd');
+        applyCardStyle('card-vpd', 'icon-vpd', 'val-vpd', maxVpdTargetDay, 'vpd');
 
         renderTrendList(data);
 
-        updateAdvisoryBox(data.daily.precipitation_probability_max[0] > 70, bestDate);
+        updateAdvisoryBox(data.daily.precipitation_probability_max[safeIndex] > 70, bestDate);
 
         const riceRec = getRiceRecommendations(data);
         document.getElementById('rice-zone').innerText = riceRec.conditionType;
@@ -119,7 +128,6 @@ analyzeBtn.addEventListener('click', async () => {
         });
 
         document.getElementById('rice-reason').innerText = riceRec.reason;
-
         document.getElementById('results-area').scrollIntoView({ behavior: 'smooth' });
         
     } catch (err) { 
